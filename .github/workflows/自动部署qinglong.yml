@@ -9,7 +9,7 @@ on:
         default: 'US(free)'
         type: choice
         options:
-          # 免费区域
+          #  免费区域
           - SG(free)  # azure新加披
           - US(free)  # aws美国    
           # AWS 区域
@@ -48,22 +48,24 @@ on:
         description: '应用名称（可选，留空则自动生成）'
         required: false
         default: ''
-      ql_port:
+      port:
         description: '青龙面板端口'
         required: true
         default: '5700'
-      ql_base_url:
-        description: '青龙面板基础URL'
-        required: true
+        type: string
+      base_url:
+        description: '部署路径（可选，默认"/"）'
+        required: false
         default: '/'
+        type: string
 
 env:
   DOCKER_IMAGE: 'whyour/qinglong:latest'
-  MEMORY: '1536M'
-  DISK: '2048M'
+  MEMORY: ${{ secrets.MEMORY || '1024M' }}
+  DISK: ${{ secrets.DISK || '2048M' }}
 
 jobs:
-  deploy-qinglong:
+  deploy-app:
     runs-on: ubuntu-latest
 
     steps:
@@ -80,7 +82,7 @@ jobs:
     - name: Determine CF API endpoint and app name
       run: |
         # 设置API端点和生成随机字符串
-        RANDOM_STR=$(head /dev/urandom | tr -dc 'a-z' | head -c 6)
+        RANDOM_STR=$(head /dev/urandom | tr -dc 'a-z0-9' | head -c 6)
         
         case "${{ github.event.inputs.region }}" in
           # 免费区域
@@ -220,8 +222,8 @@ jobs:
         
         echo "使用API端点: $CF_API"
         echo "应用名称: $APP_NAME"
-        echo "青龙面板端口: ${{ github.event.inputs.ql_port }}"
-        echo "青龙面板基础URL: ${{ github.event.inputs.ql_base_url }}"
+        echo "青龙面板端口: ${{ github.event.inputs.port }}"
+        echo "部署路径: ${{ github.event.inputs.base_url }}"
 
     - name: Login to Cloud Foundry
       run: |
@@ -240,34 +242,40 @@ jobs:
         # 使用获取的组织和空间重新登录
         cf login -a ${{ env.CF_API }} -u "${{ secrets.EMAIL }}" -p "${{ secrets.PASSWORD }}" -o "$ORG" -s "$SPACE"
 
-    - name: Deploy QingLong application
+    - name: 创建manifest.yml文件
       run: |
-        # 首先检查是否有同名的应用存在
-        if cf app ${{ env.APP_NAME }} >/dev/null 2>&1; then
-          echo "发现已存在的应用 ${{ env.APP_NAME }}，正在删除..."
-          cf delete ${{ env.APP_NAME }} -f
-        fi
-        
-        if cf push ${{ env.APP_NAME }} \
-          --docker-image ${{ env.DOCKER_IMAGE }} \
-          -m ${{ env.MEMORY }} \
-          -k ${{ env.DISK }} \
-          --health-check-type port \
-          --no-route; then
-          
-          echo "应用创建成功，正在配置环境变量..."
+        cat > manifest.yml << EOF
+        applications:
+        - name: ${{ env.APP_NAME }}
+          docker:
+            image: ${{ env.DOCKER_IMAGE }}
+          memory: ${{ env.MEMORY }}
+          disk_quota: ${{ env.DISK }}
+          env:
+            QlBaseUrl: "${{ github.event.inputs.base_url }}"
+            QlPort: "${{ github.event.inputs.port }}"
+          health-check-type: port
+        EOF
+        echo "生成的manifest.yml文件内容:"
+        cat manifest.yml
+
+    - name: Deploy application
+      run: |
+        if cf push ${{ env.APP_NAME }} -f manifest.yml; then
+          echo "部署成功"
         else
-          echo "部署失败"
+          cf delete ${{ env.APP_NAME }} -f
+          echo "部署失败，已清理失败部署残留"
           exit 1
         fi
-
-    - name: Set environment variables
-      run: |
-        # 设置端口和环境变量
-        cf set-env ${{ env.APP_NAME }} QlPort "${{ github.event.inputs.ql_port }}"
-        cf set-env ${{ env.APP_NAME }} QlBaseUrl "${{ github.event.inputs.ql_base_url }}"
         
-        # 可选：设置其他环境变量
+    - name: 设置环境变量并重启应用
+      run: |
+        # 设置额外的环境变量
+        cf set-env ${{ env.APP_NAME }} QlBaseUrl "${{ github.event.inputs.base_url }}"
+        cf set-env ${{ env.APP_NAME }} QlPort "${{ github.event.inputs.port }}"
+        
+        # 可选：从文件读取环境变量(如果存在)
         if [ -f .env ]; then
           while IFS= read -r line; do
             if [[ ! "$line" =~ ^# ]] && [[ -n "$line" ]]; then
@@ -276,35 +284,18 @@ jobs:
             fi
           done < .env
         fi
-
-    - name: Map route to application
-      run: |
-        # 获取可用的域名
-        DOMAIN=$(cf domains | grep -E '^(shared|default)' | head -1 | awk '{print $1}')
-        if [ -z "$DOMAIN" ]; then
-          DOMAIN=$(cf domains | head -2 | tail -1 | awk '{print $1}')
-        fi
         
-        echo "使用域名: $DOMAIN"
+        sleep 3
         
-        # 映射路由
-        if [ "${{ github.event.inputs.ql_base_url }}" == "/" ]; then
-          cf map-route ${{ env.APP_NAME }} $DOMAIN
-        else
-          cf map-route ${{ env.APP_NAME }} $DOMAIN --path "${{ github.event.inputs.ql_base_url }}"
-        fi
+        cf restage ${{ env.APP_NAME }}
 
-    - name: Start application
-      run: |
-        cf start ${{ env.APP_NAME }}
-
-    - name: Verify deployment
+    - name: 验证部署
       run: |
         STATUS=$(cf app ${{ env.APP_NAME }} | grep "requested state:" | awk '{print $3}')
         if [ "$STATUS" = "started" ]; then
           echo "✅ 青龙面板启动成功"
         else
-          echo "❌❌ 应用启动失败，当前状态: $STATUS"
+          echo "❌ 应用启动失败，当前状态: $STATUS"
           echo "查看应用日志:"
           cf logs ${{ env.APP_NAME }} --recent
           exit 1
@@ -312,22 +303,19 @@ jobs:
         
     - name: 详细部署信息
       run: |
-        echo "🚀🚀 部署完成！详细信息如下："
+        echo "🚀 部署完成！详细信息如下："
         echo "区域(Region): ${{ github.event.inputs.region }}"
         echo "组织(ORG): ${{ env.ORG }}"
         echo "空间(SPACE): ${{ env.SPACE }}"
         echo "应用名称(App Name): ${{ env.APP_NAME }}"
-        echo "青龙面板端口: ${{ github.event.inputs.ql_port }}"
-        echo "青龙面板基础URL: ${{ github.event.inputs.ql_base_url }}"
+        echo "青龙面板端口: ${{ github.event.inputs.port }}"
+        echo "部署路径: ${{ github.event.inputs.base_url }}"
 
         # 获取应用路由
         ROUTE=$(cf app ${{ env.APP_NAME }} | grep "routes:" | awk '{print $2}')
         if [ -n "$ROUTE" ]; then
-          if [ "${{ github.event.inputs.ql_base_url }}" == "/" ]; then
-            echo "青龙面板访问URL: https://$ROUTE"
-          else
-            echo "青龙面板访问URL: https://$ROUTE${{ github.event.inputs.ql_base_url }}"
-          fi
+          echo "青龙面板访问地址: https://${ROUTE}${{ github.event.inputs.base_url }}"
+          echo "默认端口: ${{ github.event.inputs.port }}"
         else
           echo "⚠️ 未找到应用路由，请检查部署状态。"
         fi
