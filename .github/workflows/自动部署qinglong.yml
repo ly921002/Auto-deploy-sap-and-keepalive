@@ -242,29 +242,57 @@ jobs:
 
     - name: Deploy QingLong application
       run: |
+        # 首先检查是否有同名的应用存在
+        if cf app ${{ env.APP_NAME }} >/dev/null 2>&1; then
+          echo "发现已存在的应用 ${{ env.APP_NAME }}，正在删除..."
+          cf delete ${{ env.APP_NAME }} -f
+        fi
+        
         if cf push ${{ env.APP_NAME }} \
           --docker-image ${{ env.DOCKER_IMAGE }} \
           -m ${{ env.MEMORY }} \
           -k ${{ env.DISK }} \
           --health-check-type port \
-          -u process \
           --no-route; then
           
-          echo "应用创建成功，正在配置路由和端口..."
+          echo "应用创建成功，正在配置环境变量..."
         else
-          cf delete ${{ env.APP_NAME }} -f
-          echo "部署失败，已清理失败部署残留"
+          echo "部署失败"
           exit 1
         fi
 
-    - name: Map route and set port
+    - name: Set environment variables
       run: |
-        # 映射路由
-        cf map-route ${{ env.APP_NAME }} $(cf api | cut -d' ' -f2 | sed 's/https:\/\/api\.//') --path "${{ github.event.inputs.ql_base_url }}"
-        
-        # 设置端口环境变量
+        # 设置端口和环境变量
         cf set-env ${{ env.APP_NAME }} QlPort "${{ github.event.inputs.ql_port }}"
         cf set-env ${{ env.APP_NAME }} QlBaseUrl "${{ github.event.inputs.ql_base_url }}"
+        
+        # 可选：设置其他环境变量
+        if [ -f .env ]; then
+          while IFS= read -r line; do
+            if [[ ! "$line" =~ ^# ]] && [[ -n "$line" ]]; then
+              IFS='=' read -r key value <<< "$line"
+              cf set-env ${{ env.APP_NAME }} "$key" "$value"
+            fi
+          done < .env
+        fi
+
+    - name: Map route to application
+      run: |
+        # 获取可用的域名
+        DOMAIN=$(cf domains | grep -E '^(shared|default)' | head -1 | awk '{print $1}')
+        if [ -z "$DOMAIN" ]; then
+          DOMAIN=$(cf domains | head -2 | tail -1 | awk '{print $1}')
+        fi
+        
+        echo "使用域名: $DOMAIN"
+        
+        # 映射路由
+        if [ "${{ github.event.inputs.ql_base_url }}" == "/" ]; then
+          cf map-route ${{ env.APP_NAME }} $DOMAIN
+        else
+          cf map-route ${{ env.APP_NAME }} $DOMAIN --path "${{ github.event.inputs.ql_base_url }}"
+        fi
 
     - name: Start application
       run: |
@@ -295,7 +323,11 @@ jobs:
         # 获取应用路由
         ROUTE=$(cf app ${{ env.APP_NAME }} | grep "routes:" | awk '{print $2}')
         if [ -n "$ROUTE" ]; then
-          echo "青龙面板访问URL: https://$ROUTE${{ github.event.inputs.ql_base_url }}"
+          if [ "${{ github.event.inputs.ql_base_url }}" == "/" ]; then
+            echo "青龙面板访问URL: https://$ROUTE"
+          else
+            echo "青龙面板访问URL: https://$ROUTE${{ github.event.inputs.ql_base_url }}"
+          fi
         else
           echo "⚠️ 未找到应用路由，请检查部署状态。"
         fi
