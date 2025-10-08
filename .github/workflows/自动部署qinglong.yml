@@ -61,7 +61,7 @@ on:
 
 env:
   DOCKER_IMAGE: 'whyour/qinglong:latest'
-  MEMORY: ${{ secrets.MEMORY || '512M' }}
+  MEMORY: ${{ secrets.MEMORY || '1024M' }}
   DISK: ${{ secrets.DISK || '1024M' }}
 
 jobs:
