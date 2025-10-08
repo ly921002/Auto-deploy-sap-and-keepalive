@@ -61,7 +61,7 @@ on:
 
 env:
   DOCKER_IMAGE: 'whyour/qinglong:latest'
-  MEMORY: ${{ secrets.MEMORY || '1024M' }}
+  MEMORY: ${{ secrets.MEMORY || '512M' }}
   DISK: ${{ secrets.DISK || '1024M' }}
 
 jobs:
@@ -242,9 +242,26 @@ jobs:
         # 使用获取的组织和空间重新登录
         cf login -a ${{ env.CF_API }} -u "${{ secrets.EMAIL }}" -p "${{ secrets.PASSWORD }}" -o "$ORG" -s "$SPACE"
 
+    - name: 创建manifest.yml文件
+      run: |
+        cat > manifest.yml << EOF
+        applications:
+        - name: ${{ env.APP_NAME }}
+          docker:
+            image: ${{ env.DOCKER_IMAGE }}
+          memory: ${{ env.MEMORY }}
+          disk_quota: ${{ env.DISK }}
+          env:
+            QlBaseUrl: "${{ github.event.inputs.base_url }}"
+            QlPort: "${{ github.event.inputs.port }}"
+          health-check-type: port
+        EOF
+        echo "生成的manifest.yml文件内容:"
+        cat manifest.yml
+
     - name: Deploy application
       run: |
-        if cf push ${{ env.APP_NAME }} --docker-image ${{ env.DOCKER_IMAGE }} -m ${{ env.MEMORY }} -k ${{ env.DISK }} --health-check-type port; then
+        if cf push ${{ env.APP_NAME }} -f manifest.yml; then
           echo "Deployment successful"
         else
           cf delete ${{ env.APP_NAME }} -f
@@ -252,7 +269,7 @@ jobs:
           exit 1
         fi
         
-    - name: Set environment variables and restart app
+    - name: Set environment variables
       run: |
         # 青龙面板环境变量
         cf set-env ${{ env.APP_NAME }} QlBaseUrl "${{ github.event.inputs.base_url }}"
@@ -268,9 +285,7 @@ jobs:
           done < .env
         fi
         
-        sleep 3
-        
-        cf restage ${{ env.APP_NAME }}
+        echo "环境变量设置完成，无需重启应用"
 
     - name: Verify deployment
       run: |
@@ -297,12 +312,14 @@ jobs:
         # 获取应用路由
         ROUTE=$(cf app ${{ env.APP_NAME }} | grep "routes:" | awk '{print $2}')
         if [ -n "$ROUTE" ]; then
-          echo "青龙面板访问地址: https://$ROUTE${{ github.event.inputs.base_url }}"
+          echo "青龙面板访问地址: https://${ROUTE}${{ github.event.inputs.base_url }}"
           echo ""
           echo "📝 使用说明："
           echo "1. 首次访问需要设置管理员账号和密码"
           echo "2. 建议及时修改默认密码"
           echo "3. 可以在面板中添加定时任务和脚本"
+          echo ""
+          echo "💡 注意：环境变量已设置，但可能需要几分钟才能完全生效"
         else
           echo "⚠️ 未找到应用路由，请检查部署状态。"
         fi
