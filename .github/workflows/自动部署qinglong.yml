@@ -61,8 +61,8 @@ on:
 
 env:
   DOCKER_IMAGE: 'whyour/qinglong:latest'
-  MEMORY: ${{ secrets.MEMORY || '1024M' }}
-  DISK: ${{ secrets.DISK || '2048M' }}
+  MEMORY: ${{ secrets.MEMORY || '512M' }}
+  DISK: ${{ secrets.DISK || '1024M' }}
 
 jobs:
   deploy-app:
@@ -88,130 +88,130 @@ jobs:
           # 免费区域
           "SG(free)")
             echo "CF_API=https://api.cf.ap21.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-freesg$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-freesg$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "US(free)")
             echo "CF_API=https://api.cf.us10-001.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-freeus$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-freeus$RANDOM_STR" >> $GITHUB_ENV
             ;;
           # AWS 区域
           "AWS-AU(Sydney)")
             echo "CF_API=https://api.cf.ap10.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-awsau$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-awsau$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "AWS-BR(São Paulo)")
             echo "CF_API=https://api.cf.br10.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-awsbr$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-awsbr$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "AWS-KR(Seoul)")
             echo "CF_API=https://api.cf.ap12.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-awskr$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-awskr$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "AWS-CA(Montreal)")
             echo "CF_API=https://api.cf.ca10.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-awsca$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-awsca$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "AWS-US(VA)")
             echo "CF_API=https://api.cf.us10-001.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-awsusva$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-awsusva$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "AWS-US(OR)")
             echo "CF_API=https://api.cf.us11.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-awsusor$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-awsusor$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "AWS-EU(Frankfurt)")
             echo "CF_API=https://api.cf.eu10-005.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-waseu$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-waseu$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "AWS-JP(Tokyo)")
             echo "CF_API=https://api.cf.jp10.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-awsjp$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-awsjp$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "AWS-SG(Singapore)")
             echo "CF_API=https://api.cf.ap11.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-awssg$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-awssg$RANDOM_STR" >> $GITHUB_ENV
             ;;
           
           # GCP 区域
           "GCP-AU(Sydney)")
             echo "CF_API=https://api.cf.ap30.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-gcpau$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-gcpau$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "GCP-BR(São Paulo)")
             echo "CF_API=https://api.cf.br30.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-gcpbr$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-gcpbr$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "GCP-US(IA)")
             echo "CF_API=https://api.cf.us30.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-gcpus$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-gcpus$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "GCP-EU(Frankfurt)")
             echo "CF_API=https://api.cf.eu30.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-gcpeu$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-gcpeu$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "GCP-JP(Osaka)")
             echo "CF_API=https://api.cf.jp30.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-gcpjpo$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-gcpjpo$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "GCP-JP(Tokyo)")
             echo "CF_API=https://api.cf.jp31.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-gcpjpt$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-gcpjpt$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "GCP-IL(Tel Aviv)")
             echo "CF_API=https://api.cf.il30.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-gcpil$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-gcpil$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "GCP-IN(Mumbai)")
             echo "CF_API=https://api.cf.in30.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-gcpin$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-gcpin$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "GCP-KSA(Dammam)")
             echo "CF_API=https://api.cf.sa31.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-gcpsa$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-gcpsa$RANDOM_STR" >> $GITHUB_ENV
             ;;
           
           # Azure 区域
           "Azure-AU(Sydney)")
             echo "CF_API=https://api.cf.ap20.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-azau$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-azau$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "Azure-BR(São Paulo)")
             echo "CF_API=https://api.cf.br20.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-azbr$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-azbr$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "Azure-CA(Montreal)")
             echo "CF_API=https://api.cf.ca20.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-azca$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-azca$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "Azure-US(VA)")
             echo "CF_API=https://api.cf.us21.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-azva$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-azva$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "Azure-US(WA)")
             echo "CF_API=https://api.cf.us20.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-azwa$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-azwa$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "Azure-EU(Netherlands)")
             echo "CF_API=https://api.cf.eu20-001.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-azeu$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-azeu$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "Azure-JP(Tokyo)")
             echo "CF_API=https://api.cf.jp20.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-azjp$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-azjp$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "Azure-SG(Singapore)")
             echo "CF_API=https://api.cf.ap21.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-azsg$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-azsg$RANDOM_STR" >> $GITHUB_ENV
             ;;
           
           # SAP Neo 区域
           "Neo-UAE(Dubai)")
             echo "CF_API=https://api.cf.neo-ae1.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-neouae$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-neouae$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "Neo-KSA(Riyadh)")
             echo "CF_API=https://api.cf.neo-sa1.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=qinglong-neoksa$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=ql-neoksa$RANDOM_STR" >> $GITHUB_ENV
             ;;
         esac
         
@@ -242,36 +242,19 @@ jobs:
         # 使用获取的组织和空间重新登录
         cf login -a ${{ env.CF_API }} -u "${{ secrets.EMAIL }}" -p "${{ secrets.PASSWORD }}" -o "$ORG" -s "$SPACE"
 
-    - name: 创建manifest.yml文件
-      run: |
-        cat > manifest.yml << EOF
-        applications:
-        - name: ${{ env.APP_NAME }}
-          docker:
-            image: ${{ env.DOCKER_IMAGE }}
-          memory: ${{ env.MEMORY }}
-          disk_quota: ${{ env.DISK }}
-          env:
-            QlBaseUrl: "${{ github.event.inputs.base_url }}"
-            QlPort: "${{ github.event.inputs.port }}"
-          health-check-type: port
-        EOF
-        echo "生成的manifest.yml文件内容:"
-        cat manifest.yml
-
     - name: Deploy application
       run: |
-        if cf push ${{ env.APP_NAME }} -f manifest.yml; then
-          echo "部署成功"
+        if cf push ${{ env.APP_NAME }} --docker-image ${{ env.DOCKER_IMAGE }} -m ${{ env.MEMORY }} -k ${{ env.DISK }} --health-check-type port; then
+          echo "Deployment successful"
         else
           cf delete ${{ env.APP_NAME }} -f
-          echo "部署失败，已清理失败部署残留"
+          echo "伙计,没资源了,部署失败,请明天早上8:10至9:00再尝试部署,已清理失败部署残留"
           exit 1
         fi
         
-    - name: 设置环境变量并重启应用
+    - name: Set environment variables and restart app
       run: |
-        # 设置额外的环境变量
+        # 青龙面板环境变量
         cf set-env ${{ env.APP_NAME }} QlBaseUrl "${{ github.event.inputs.base_url }}"
         cf set-env ${{ env.APP_NAME }} QlPort "${{ github.event.inputs.port }}"
         
@@ -289,7 +272,7 @@ jobs:
         
         cf restage ${{ env.APP_NAME }}
 
-    - name: 验证部署
+    - name: Verify deployment
       run: |
         STATUS=$(cf app ${{ env.APP_NAME }} | grep "requested state:" | awk '{print $3}')
         if [ "$STATUS" = "started" ]; then
@@ -314,8 +297,12 @@ jobs:
         # 获取应用路由
         ROUTE=$(cf app ${{ env.APP_NAME }} | grep "routes:" | awk '{print $2}')
         if [ -n "$ROUTE" ]; then
-          echo "青龙面板访问地址: https://${ROUTE}${{ github.event.inputs.base_url }}"
-          echo "默认端口: ${{ github.event.inputs.port }}"
+          echo "青龙面板访问地址: https://$ROUTE${{ github.event.inputs.base_url }}"
+          echo ""
+          echo "📝 使用说明："
+          echo "1. 首次访问需要设置管理员账号和密码"
+          echo "2. 建议及时修改默认密码"
+          echo "3. 可以在面板中添加定时任务和脚本"
         else
           echo "⚠️ 未找到应用路由，请检查部署状态。"
         fi
