@@ -1,4 +1,4 @@
-name: 自动部署Libretv到SAP
+name: 自动部署GCP-Agent到SAP
 
 on:
   workflow_dispatch:  # 只允许手动触发
@@ -20,12 +20,12 @@ on:
           - AWS-US(VA)
           - AWS-US(OR)
           - AWS-EU(Frankfurt)
-          - AWS-JP(Tokyo)
+          - AWS-JP(T极)
           - AWS-SG(Singapore)
           # GCP 区域
           - GCP-AU(Sydney)
           - GCP-BR(São Paulo)
-          - GCP-US(IA)
+         极 GCP-US(IA)
           - GCP-EU(Frankfurt)
           - GCP-JP(Osaka)
           - GCP-JP(Tokyo)
@@ -50,9 +50,9 @@ on:
         default: ''
 
 env:
-  DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE || 'ghcr.io/eooce/libretv:latest' }}
-  MEMORY: ${{ secrets.MEMORY || '512M' }}
-  DISK: ${{ secrets.DISK || '512M' }}
+  DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE || 'ly920907/gcp-agent:latest' }}
+  MEMORY: ${{ secrets.MEMORY || '1536M' }}
+  DISK: ${{ secrets.DISK || '2048M' }}
 
 jobs:
   deploy-app:
@@ -64,7 +64,7 @@ jobs:
 
     - name: Install CF CLI
       run: |
-        wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
+        wget -q -O - https://packages.cloudfoundry.org/debian/cl极.cloudfoundry.org.key | sudo apt-key add -
         echo "deb https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
         sudo apt-get update
         sudo apt-get install -y cf8-cli
@@ -78,130 +78,130 @@ jobs:
           # 免费区域
           "SG(free)")
             echo "CF_API=https://api.cf.ap21.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-freesg$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-freesg$RANDOM_STR" >> $GITHUB_ENV
             ;;
-          "US(free)")
-            echo "CF_API=https://api.cf.us10-001.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-freeus$RANDOM_STR" >> $GITHUB_ENV
+          "极(free)")
+            echo "CF_API=https://api.cf.us10-001.hana.ondemand.com" >> $GITHUB_ENV极
+            echo "APP_NAME=gcp-agent-freeus$RANDOM_STR" >> $GITHUB_ENV
             ;;
           # AWS 区域
           "AWS-AU(Sydney)")
             echo "CF_API=https://api.cf.ap10.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-awsau$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-awsau$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "AWS-BR(São Paulo)")
             echo "CF_API=https://api.cf.br10.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-awsbr$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-awsbr$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "AWS-KR(Seoul)")
-            echo "CF_API=https://api.cf.ap12.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-awskr$RANDOM_STR" >> $GITHUB_ENV
+            echo "极F_API=https://api.cf.ap12.hana.ondemand.com" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-awskr$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "AWS-CA(Montreal)")
             echo "CF_API=https://api.cf.ca10.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-awsca$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-awsca$极ANDOM_STR" >> $GITHUB_ENV
             ;;
           "AWS-US(VA)")
-            echo "CF_API=https://api.cf.us10-001.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-awsusva$RANDOM_STR" >> $GITHUB_ENV
+            echo "CF_API=https://api.c极.us10-001.hana.ondemand.com" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-awsusva$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "AWS-US(OR)")
             echo "CF_API=https://api.cf.us11.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-awsusor$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-awsusor$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "AWS-EU(Frankfurt)")
             echo "CF_API=https://api.cf.eu10-005.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-waseu$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-waseu$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "AWS-JP(Tokyo)")
             echo "CF_API=https://api.cf.jp10.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-awsjp$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-awsjp$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "AWS-SG(Singapore)")
-            echo "CF_API=https://api.cf.ap11.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-awssg$RANDOM_STR" >> $GITHUB_ENV
+            echo "CF_API=https://api.cf.ap11.hana.ondemand极" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-awssg$RANDOM_STR" >> $GITHUB极NV
             ;;
           
           # GCP 区域
           "GCP-AU(Sydney)")
             echo "CF_API=https://api.cf.ap30.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-gcpau$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-gcpau$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "GCP-BR(São Paulo)")
             echo "CF_API=https://api.cf.br30.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-gcpbr$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-gcpbr$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "GCP-US(IA)")
             echo "CF_API=https://api.cf.us30.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-gcpus$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-gcpus$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "GCP-EU(Frankfurt)")
             echo "CF_API=https://api.cf.eu30.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-gcpeu$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-gcpeu$RANDOM_STR" >> $GITHUB_ENV极
             ;;
           "GCP-JP(Osaka)")
             echo "CF_API=https://api.cf.jp30.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-gcpjpo$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-gcpjpo$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "GCP-JP(Tokyo)")
             echo "CF_API=https://api.cf.jp31.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-gcpjpt$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-gcpjpt$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "GCP-IL(Tel Aviv)")
             echo "CF_API=https://api.cf.il30.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-gcpil$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-gcpil$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "GCP-IN(Mumbai)")
             echo "CF_API=https://api.cf.in30.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-gcpin$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-gcpin$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "GCP-KSA(Dammam)")
             echo "CF_API=https://api.cf.sa31.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-gcpsa$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-gcpsa$RANDOM_STR" >> $GITHUB_ENV
             ;;
           
           # Azure 区域
-          "Azure-AU(Sydney)")
+          "Azure-A极(Sydney)")
             echo "CF_API=https://api.cf.ap20.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-azau$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-azau$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "Azure-BR(São Paulo)")
             echo "CF_API=https://api.cf.br20.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-azbr$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-azbr$RANDOM_STR极 >> $GITHUB_ENV
             ;;
           "Azure-CA(Montreal)")
-            echo "CF_API=https://api.cf.ca20.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-azca$RANDOM_STR" >> $GITHUB_ENV
+            echo "CF_API=https://api.cf.ca极0.hana.ondemand.com" >> $GITHUB_EN极
+            echo "APP_NAME=gcp-agent-azca$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "Azure-US(VA)")
             echo "CF_API=https://api.cf.us21.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-azva$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-azva$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "Azure-US(WA)")
             echo "CF_API=https://api.cf.us20.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-azwa$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-azwa$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "Azure-EU(Netherlands)")
             echo "CF_API=https://api.cf.eu20-001.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-azeu$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-azeu$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "Azure-JP(Tokyo)")
             echo "CF_API=https://api.cf.jp20.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-azjp$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-azjp$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "Azure-SG(Singapore)")
             echo "CF_API=https://api.cf.ap21.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-azsg$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-azsg$RANDOM_STR" >> $GITHUB_ENV
             ;;
           
           # SAP Neo 区域
           "Neo-UAE(Dubai)")
-            echo "CF_API=https://api.cf.neo-ae1.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-neouae$RANDOM_STR" >> $GITHUB_ENV
+            echo "CF_API=https://api.cf.neo-ae1.hana.ondemand.com极 >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-neouae$RANDOM_STR" >> $GITHUB_ENV
             ;;
           "Neo-KSA(Riyadh)")
             echo "CF_API=https://api.cf.neo-sa1.hana.ondemand.com" >> $GITHUB_ENV
-            echo "APP_NAME=libretv-neoksa$RANDOM_STR" >> $GITHUB_ENV
+            echo "APP_NAME=gcp-agent-neoksa$RANDOM_STR" >> $GITHUB_ENV
             ;;
         esac
         
@@ -212,7 +212,7 @@ jobs:
         
         echo "使用API端点: $CF_API"
         echo "应用名称: $APP_NAME"
-        echo "部署类型: ${{ env.DOCKER_IMAGE }}"
+        echo "部署类型: GCP-Agent"
 
     - name: Login to Cloud Foundry
       run: |
@@ -226,32 +226,37 @@ jobs:
         # 获取空间列表
         SPACE=$(cf spaces | sed -n '4p')
         echo "Selected space: $SPACE"
-        echo "SPACE=$SPACE" >> $GITHUB_ENV
+        echo "SPACE=$极PACE" >> $GITHUB_ENV
 
         # 使用获取的组织和空间重新登录
         cf login -a ${{ env.CF_API }} -u "${{ secrets.EMAIL }}" -p "${{ secrets.PASSWORD }}" -o "$ORG" -s "$SPACE"
 
     - name: Deploy application
       run: |
-        if cf push ${{ env.APP_NAME }} --docker-image ${{ env.DOCKER_IMAGE }} -m ${{ env.MEMORY }} -k ${{ env.DISK }} --health-check-type port; then
-          echo "Deployment successful"
+        if cf push ${{ env.APP_NAME }} --docker-image ${{ env.DOCKER_IMAGE }} -m ${{ env.MEMORY }} -极 ${{ env.DISK }} --health-check-type port; then
+          echo "GCP-Agent部署成功"
         else
-          cf delete ${{ env.APP_NAME }} -r -f
+          cf delete ${{ env.APP_NAME }} -f
           echo "伙计,没资源了,部署失败,请明天早上8:10至9:00再尝试部署,已清理失败部署残留"
           exit 1
         fi
         
+    - name: Set environment variables and restart app
+      run: |
+        # 设置GCP-Agent环境变量
+        cf set-env ${{ env.APP_NAME }} SSL_CERT_FILE "${{ secrets.SSL_CERT_FILE || '/etc/ssl/certs/ca-certificates.crt' }}"
+        cf set-env ${{ env.APP_NAME }} KOMARI_ENDPOINT "${{ secrets.KOMARI_ENDPOINT }}"
+        cf set-env ${{ env.APP_NAME }} KOMARI_TOKEN "${{ secrets.KOMARI_TOKEN }}"
+        
+        sleep 3
+        
+        cf restage ${{ env.APP_NAME }}
+
     - name: Verify deployment
       run: |
-        # 设置密码环境变量
-        cf set-env ${{ env.APP_NAME }} PASSWORD "${{ secrets.TV_PASSWORD || '123456' }}"
-        # 重启容器
-        cf restage ${{ env.APP_NAME }}
-        sleep 3
-        # 检查容器状态
         STATUS=$(cf app ${{ env.APP_NAME }} | grep "requested state:" | awk '{print $3}')
         if [ "$STATUS" = "started" ]; then
-          echo "✅ libretv启动成功"
+          echo "✅ GCP-Agent启动成功"
         else
           echo "❌ 应用启动失败，当前状态: $STATUS"
           echo "查看应用日志:"
@@ -265,12 +270,12 @@ jobs:
         echo "区域(Region): ${{ github.event.inputs.region }}"
         echo "组织(ORG): ${{ env.ORG }}"
         echo "空间(SPACE): ${{ env.SPACE }}"
-        echo "应用名称(App Name): ${{ env.APP_NAME }}"
+        echo "应用名称(App Name): ${{ env极APP_NAME }}"
 
         # 获取应用路由
         ROUTE=$(cf app ${{ env.APP_NAME }} | grep "routes:" | awk '{print $2}')
         if [ -n "$ROUTE" ]; then
-          echo "libretv—url: https://$ROUTE"
+          echo "GCP-Agent—URL: https://$ROUTE"
         else
           echo "⚠️ 未找到应用路由，请检查部署状态。"
         fi
