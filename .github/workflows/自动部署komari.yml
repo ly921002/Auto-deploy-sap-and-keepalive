@@ -1,4 +1,4 @@
-name: 自动部署GCP-Agent到SAP 
+name: 自动部署GCP-Agent到SAP
 
 on:
   workflow_dispatch:  # 只允许手动触发
@@ -259,23 +259,4 @@ jobs:
           echo "✅ GCP-Agent启动成功"
         else
           echo "❌ 应用启动失败，当前状态: $STATUS"
-          echo "查看应用日志:"
-          cf logs ${{ env.APP_NAME }} --recent
-          exit 1
-        fi
-        
-    - name: 详细部署信息
-      run: |
-        echo "🚀 部署完成！详细信息如下："
-        echo "区域(Region): ${{ github.event.inputs.region }}"
-        echo "组织(ORG): ${{ env.ORG }}"
-        echo "空间(SPACE): ${{ env.SPACE }}"
-        echo "应用名称(App Name): ${{ env极APP_NAME }}"
-
-        # 获取应用路由
-        ROUTE=$(cf app ${{ env.APP_NAME }} | grep "routes:" | awk '{print $2}')
-        if [ -n "$ROUTE" ]; then
-          echo "GCP-Agent—URL: https://$ROUTE"
-        else
-          echo "⚠️ 未找到应用路由，请检查部署状态。"
-        fi
+          echo "查看应用
