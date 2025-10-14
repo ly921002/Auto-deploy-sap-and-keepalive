@@ -241,7 +241,7 @@ jobs:
           exit 1
         fi
         
-    - name: Set environment variables and restart app
+    - name: Set environment variables
       run: |
         # 设置三个指定的环境变量
         cf set-env ${{ env.APP_NAME }} SSL_CERT_FILE "${{ secrets.SSL_CERT_FILE }}"
