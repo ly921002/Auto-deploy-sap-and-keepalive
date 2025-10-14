@@ -51,8 +51,8 @@ on:
 
 env:
   DOCKER_IMAGE: 'ly920907/gcp-agent:latest'
-  MEMORY: ${{ secrets.MEMORY || '1536M' }}
-  DISK: ${{ secrets.DISK || '2048M' }}
+  MEMORY: ${{ secrets.MEMORY || '256M' }}
+  DISK: ${{ secrets.DISK || '256M' }}
 
 jobs:
   deploy-app:
