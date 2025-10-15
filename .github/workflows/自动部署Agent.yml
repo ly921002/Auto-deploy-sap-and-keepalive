@@ -245,8 +245,8 @@ jobs:
       run: |
         # 设置三个指定的环境变量
         cf set-env ${{ env.APP_NAME }} SSL_CERT_FILE "${{ secrets.SSL_CERT_FILE }}"
-        cf set-env ${{ env.APP_NAME }} KOMARI_ENDPOINT "${{ secrets.KOMARI_ENDPOINT }}"
-        cf set-env ${{ env.APP_NAME }} KOMARI_TOKEN "${{ secrets.KOMARI_TOKEN }}"
+        cf set-env ${{ env.APP_NAME }} ENDPOINT "${{ secrets.ENDPOINT }}"
+        cf set-env ${{ env.APP_NAME }} TOKEN "${{ secrets.TOKEN }}"
         
 
     - name: Verify deployment
