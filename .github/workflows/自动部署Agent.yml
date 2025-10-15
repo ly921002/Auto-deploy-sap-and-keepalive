@@ -233,7 +233,7 @@ jobs:
 
     - name: Deploy application
       run: |
-        if cf push ${{ env.APP_NAME }} --docker-image ${{ env.DOCKER_IMAGE }} -m ${{ env.MEMORY }} -k ${{ env.DISK }} --health-check-type port; then
+        if cf push ${{ env.APP_NAME }} --docker-image ${{ env.DOCKER_IMAGE }} -m ${{ env.MEMORY }} -k ${{ env.DISK }} --health-check-type process; then
           echo "Deployment successful"
         else
           cf delete ${{ env.APP_NAME }} -f
