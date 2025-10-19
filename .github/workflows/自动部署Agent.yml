@@ -233,7 +233,7 @@ jobs:
 
     - name: Deploy application
       run: |
-        if cf push ${{ env.APP_NAME }} --docker-image ${{ env.DOCKER_IMAGE }} -m ${{ env.MEMORY }} -k ${{ env.DISK }} --health-check-type process; then
+        if cf push ${{ env.APP_NAME }} --docker-image ${{ env.DOCKER_IMAGE }} -m ${{ env.MEMORY }} -k ${{ env.DISK }} --health-check-type process -c "$START_COMMAND"; then
           echo "Deployment successful"
         else
           cf delete ${{ env.APP_NAME }} -f
@@ -247,15 +247,20 @@ jobs:
         cf set-env ${{ env.APP_NAME }} SSL_CERT_FILE "${{ secrets.SSL_CERT_FILE }}"
         cf set-env ${{ env.APP_NAME }} ENDPOINT "${{ secrets.ENDPOINT }}"
         cf set-env ${{ env.APP_NAME }} TOKEN "${{ secrets.TOKEN }}"
-        
+        # 添加 Web 服务器端口环境变量
+        cf set-env ${{ env.APP_NAME }} WEB_PORT "8080"
 
     - name: Verify deployment
       run: |
         STATUS=$(cf app ${{ env.APP_NAME }} | grep "requested state:" | awk '{print $3}')
         if [ "$STATUS" = "started" ]; then
           echo "✅ 应用启动成功"
+          # 测试根路由
+          ROUTE=$(cf app ${{ env.APP_NAME }} | grep "routes:" | awk '{print $2}')
+          echo "测试根路由响应:"
+          curl -s "https://$ROUTE" || echo "Web服务器可能还在启动中..."
         else
-          echo "❌ 应用启动失败，当前状态: $STATUS"
+          echo "❌❌ 应用启动失败，当前状态: $STATUS"
           echo "查看应用日志:"
           cf logs ${{ env.APP_NAME }} --recent
           exit 1
@@ -263,7 +268,7 @@ jobs:
         
     - name: 详细部署信息
       run: |
-        echo "🚀 部署完成！详细信息如下："
+        echo "🚀🚀 部署完成！详细信息如下："
         echo "区域(Region): ${{ github.event.inputs.region }}"
         echo "组织(ORG): ${{ env.ORG }}"
         echo "空间(SPACE): ${{ env.SPACE }}"
@@ -273,6 +278,7 @@ jobs:
         ROUTE=$(cf app ${{ env.APP_NAME }} | grep "routes:" | awk '{print $2}')
         if [ -n "$ROUTE" ]; then
           echo "应用URL: https://$ROUTE"
+          echo "根路由测试: curl https://$ROUTE 应该返回 'Hello world!'"
         else
           echo "⚠️ 未找到应用路由，请检查部署状态。"
         fi
