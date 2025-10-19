@@ -257,7 +257,25 @@ jobs:
           # 测试根路由
           ROUTE=$(cf app ${{ env.APP_NAME }} | grep "routes:" | awk '{print $2}')
           echo "测试根路由响应:"
-          curl -s "https://$ROUTE" || echo "Web服务器可能还在启动中..."
+          
+          # 增加重试机制
+          for i in {1..5}; do
+            RESPONSE=$(curl -s "https://$ROUTE")
+            if [ "$RESPONSE" = "Hello world!" ]; then
+              echo "✅ 成功收到 'Hello world!' 响应"
+              break
+            else
+              echo "尝试 $i: 未收到预期响应，等待 5 秒后重试..."
+              sleep 5
+            fi
+          done
+          
+          if [ "$RESPONSE" != "Hello world!" ]; then
+            echo "❌ 未收到 'Hello world!' 响应，实际响应: $RESPONSE"
+            echo "查看应用日志:"
+            cf logs ${{ env.APP_NAME }} --recent
+            exit 1
+          fi
         else
           echo "❌❌ 应用启动失败，当前状态: $STATUS"
           echo "查看应用日志:"
