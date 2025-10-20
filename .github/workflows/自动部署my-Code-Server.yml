@@ -1,4 +1,4 @@
-name: 自动部署Code-Server到SAP
+name: 自动部署my-Code-Server到SAP
 
 on:
   workflow_dispatch:  # 只允许手动触发
@@ -50,7 +50,7 @@ on:
         default: ''
 
 env:
-  DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE || 'codercom/code-server:latest' }}
+  DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE || 'ly920907/auto-code-server:latest' }}
   MEMORY: ${{ secrets.MEMORY || '1536M' }}
   DISK: ${{ secrets.DISK || '2048M' }}
 
